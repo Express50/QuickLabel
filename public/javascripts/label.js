@@ -3,7 +3,8 @@ $(document).ready(function () {
     if(height > 0) {
         $( '#two' ).css("margin-top", height);
     }
-    let cur_id = document.getElementById("cur_id").textContent;
+    // let cur_id = document.getElementById("cur_id").textContent;
+    let cur_id = document.getElementById("cur_id").value;
     let searchDisplay = document.getElementById("searchbar");
     let searchText = document.getElementById("searchText");
 
@@ -19,6 +20,9 @@ $(document).ready(function () {
         $searchContent = $(".searchable"),
         // jQuery object to save <mark> elements
         $searchResults,
+        // search for entry by ID
+        $searchIdBtn = $("button[id='searchId']"),
+        $searchIdInput = $("input[id='cur_id']"),
         // the class that will be appended to the current
         // focused element
         currentClass = "current",
@@ -193,7 +197,31 @@ $(document).ready(function () {
         }
     });
 
+    /*
+    * Search patients by ID
+    */
+    function searchId() {
+        console.log($searchIdInput.prop("value"))
+        if ($searchIdInput.prop("value") !== undefined || $searchIdInput.prop("value") !== ""){
+            $searchIdInput.unmark();
+            search_id = $searchIdInput.prop("value")
+            $.ajax('/' + search_id)
+        }
+
+        return false;
+    }
+
+    $searchIdBtn.on("click", searchId);
+    $searchIdInput.keydown(function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            searchId();
+        }
+    });
+
     $("input").keydown(function(event) {
+        if (event.target === $searchIdInput) return;
+
         if (event.keyCode === 13) {
             event.preventDefault();
         }
