@@ -205,10 +205,8 @@ $(document).ready(function () {
         if ($searchIdInput.prop("value") !== undefined || $searchIdInput.prop("value") !== ""){
             $searchIdInput.unmark();
             search_id = $searchIdInput.prop("value")
-            $.ajax('/' + search_id)
+            window.location.href = "/" + search_id
         }
-
-        return false;
     }
 
     $searchIdBtn.on("click", searchId);
