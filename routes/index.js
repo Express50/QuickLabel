@@ -237,7 +237,7 @@ function parse_files(label_map_file, charts_file, neighbourhood_file) {
                             });
                         } else {
                             load_status = "Load";
-                            console.log("Ready");
+                            console.log("Finished parsing CSVs");
                             console.timeEnd("dbsave");
                         }
                     }
@@ -261,13 +261,21 @@ router.get('/settings', function(req, res, next){
     });
 });
 
-router.post('/load', function(req, res, next){
+router.post('/load', async(req, res, next) => {
     load_status = "Loading";
     reset_data();
     charts_file = req.body["charts_file"];
     label_map_file = req.body["label_map_file"];
     save_location = req.body["save_location"];
-    parse_files(label_map_file, charts_file);
+
+    // need to do this synchronously since we try to get '/' right away
+    console.log('started parse')
+    await new Promise(function (resolve, reject) {
+        parse_files(label_map_file, charts_file);
+        resolve();
+    });
+    console.log('finished parse')
+
     fs.writeFile('settings.json',
         JSON.stringify({charts_file: charts_file, label_map_file: label_map_file, save_location: save_location},
             null, 4),
@@ -341,7 +349,7 @@ router.get('/:index_id', function (req, res, next) {
     // is index_id actually a patient id?
     let index = set_array.indexOf(req.params["index_id"]);
     if (index === -1) { // if not, we can render the page
-        console.log(id_dict);
+        console.log(Object.keys(id_dict).length);
         res.render('record', {
             title: "Quick Label",
             //neighbourhood_data: id_dict[set_array[Number(req.params["index_id"])]]["neighbourhood"],
