@@ -17,6 +17,8 @@ Data file:
 
     First column (id): Only rows with number format will be added. Repeat ids if there is additional data for same id.
     Second column (data): Data is assumed to be in text format.
+
+**Note**: header must start with "ID" column.
     
 Map file:
 

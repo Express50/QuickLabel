@@ -170,7 +170,8 @@ function get_labels(items){
 
 function get_charts(items){
     //let items = parse(line)[0];
-    if (isNaN(items[0]) || items[0] === ""){
+    // ignore lines that start with "ID" --> assume these are column headers
+    if (items[0] === "ID" || items[0] === ""){
         return;
     }
     if (id_dict[items[0]] === undefined) {
@@ -348,21 +349,31 @@ router.get('/save', function(req, res, next){
 router.get('/:index_id', function (req, res, next) {
     // is index_id actually a patient id?
     let index = set_array.indexOf(req.params["index_id"]);
-    if (index === -1) { // if not, we can render the page
-        console.log(Object.keys(id_dict).length);
+
+    if (index !== -1) { // if it is, redirect
+        res.redirect('/' + index);
+        return;
+    }
+
+    // otherwise, check if index_id can index into set_array
+    index = Number(req.params["index_id"])
+
+    if (index >= 0 && index < set_array.length) { // if it can, render
         res.render('record', {
             title: "Quick Label",
             //neighbourhood_data: id_dict[set_array[Number(req.params["index_id"])]]["neighbourhood"],
-            text_data: id_dict[set_array[Number(req.params["index_id"])]]["text"],
-            index_id: Number(req.params["index_id"]), max_index: set_array.length,
-            cur_id: set_array[Number(req.params["index_id"])],
-            labels: labels[set_array[Number(req.params["index_id"])]],
+            text_data: id_dict[set_array[index]]["text"],
+            index_id: index, max_index: set_array.length,
+            cur_id: set_array[index],
+            labels: labels[set_array[index]],
             label_map: label_map,
             save_status: save_status
         });
-    } else { // otherwise, just redirect to the appropriate index_id
-        res.redirect('/' + index);
+        return;
     }
+
+    // otherwise, redirect to index 0
+    res.redirect('/0');
 });
 
 module.exports = router;
